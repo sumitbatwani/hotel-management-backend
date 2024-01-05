@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from db import MongoDB
 from fastapi.middleware.cors import CORSMiddleware
 from apis.hotels import router as hotel_router
+from apis.users import router as user_router
 
 app = FastAPI()
 
@@ -37,6 +38,7 @@ async def ping_db():
 
 # Include your API routers
 app.include_router(hotel_router, prefix="/hotels", tags=["hotels"])
+app.include_router(user_router, prefix="/users", tags=["users"])
 
 if __name__ == "__main__":
     import uvicorn

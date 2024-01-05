@@ -8,14 +8,14 @@ router = APIRouter()
 mongo = MongoDB(uri="mongodb://localhost:27017/", db_name="hotelsDB")
 hotels_collection = mongo.get_database_by_name("hotelsDB")["hotels"]
 
-@router.post("/hotels/", response_model=Hotel)
+@router.post("/", response_model=Hotel)
 def create_hotel(hotel: Hotel):
     hotel_data = hotel.dict()
     result = hotels_collection.insert_one(hotel_data)
     hotel_data['_id'] = str(result.inserted_id)
     return hotel_data
 
-@router.get("/hotels/{hotel_id}", response_model=Hotel)
+@router.get("/{hotel_id}", response_model=Hotel)
 def read_hotel(hotel_id: str):
     result = hotels_collection.find_one({"_id": ObjectId(hotel_id)})
     if result:
@@ -23,12 +23,12 @@ def read_hotel(hotel_id: str):
     else:
         raise HTTPException(status_code=404, detail="Hotel not found")
 
-@router.get("/hotels/", response_model=List[Hotel])
+@router.get("/", response_model=List[Hotel])
 def read_hotels(skip: int = 0, limit: int = 10):
     cursor = hotels_collection.find().skip(skip).limit(limit)
     return list(cursor)
 
-@router.patch("/hotels/{hotel_id}", response_model=Hotel)
+@router.patch("/{hotel_id}", response_model=Hotel)
 def update_hotel(hotel_id: str, hotel: Hotel):
     existing_hotel = hotels_collection.find_one({"_id": ObjectId(hotel_id)})
 
@@ -47,7 +47,7 @@ def update_hotel(hotel_id: str, hotel: Hotel):
 
     return updated_hotel
 
-@router.delete("/hotels/{hotel_id}", response_model=dict)
+@router.delete("/{hotel_id}", response_model=dict)
 def delete_hotel(hotel_id: str):
     result = hotels_collection.delete_one({"_id": ObjectId(hotel_id)})
     if result.deleted_count == 1:
@@ -55,7 +55,7 @@ def delete_hotel(hotel_id: str):
     else:
         raise HTTPException(status_code=404, detail="Hotel not found")
     
-@router.get("/hotels/filter/", response_model=List[Hotel])
+@router.get("/filter/", response_model=List[Hotel])
 def filter_hotels(
     name: str = Query(None, description="Name to filter hotels"),
     location: str = Query(None, description="Location to filter hotels"),
